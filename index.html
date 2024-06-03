@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="videoModal" class="modal">
+            <div class="modal-content">
+                <div id="player"></div>
+                <p>You need to watch the video for 5 seconds to proceed. Time left: <span id="countdown">5</span></p>
+            </div>
+        </div>
+        <h1>Enter your Reward ID</h1>
+        <input type="text" id="rewardIdInput" placeholder="Enter your reward ID">
+        <input type="text" id="playerNameInput" placeholder="Enter your player name">
+        <button onclick="fetchRewards()">Submit</button>
+        <div id="rewardsContainer"></div>
+    </div>
+
+    <script>
+        let player;
+        let countdownInterval;
+        let countdown = 5;
+
+        // Set the video ID from PHP config
+        const videoId = '<?php echo $config['youtube']['video_id']; ?>';
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: videoId,
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !countdownInterval) {
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    document.getElementById('countdown').textContent = countdown;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        document.getElementById('videoModal').style.display = 'none';
+                    }
+                }, 1000);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('videoModal').style.display = 'block';
+            const urlParams = new URLSearchParams(window.location.search);
+            const rewardId = urlParams.get('reward_id');
+            if (rewardId) {
+                document.getElementById('rewardIdInput').value = rewardId;
+                fetchRewards();
+            }
+        });
+
+        function fetchRewards() {
+            const rewardId = document.getElementById('rewardIdInput').value;
+            fetch(`get_rewards.php?reward_id=${rewardId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        displayRewards(data);
+                    }
+                });
+        }
+
+        function displayRewards(data) {
+            const rewardsContainer = document.getElementById('rewardsContainer');
+            rewardsContainer.innerHTML = `
+                <h2>Choose your reward</h2>
+                <div class="reward" onclick="claimReward('${data.reward_id}', 'reward1')">
+                    <img src="${data.reward1_img}" alt="${data.reward1_label}">
+                    <p>${data.reward1_label}</p>
+                </div>
+                <div class="reward" onclick="claimReward('${data.reward_id}', 'reward2')">
+                    <img src="${data.reward2_img}" alt="${data.reward2_label}">
+                    <p>${data.reward2_label}</p>
+                </div>
+                <div class="reward" onclick="claimReward('${data.reward_id}', 'reward3')">
+                    <img src="${data.reward3_img}" alt="${data.reward3_label}">
+                    <p>${data.reward3_label}</p>
+                </div>
+            `;
+        }
+
+        function claimReward(rewardId, reward) {
+            const playerName = document.getElementById('playerNameInput').value;
+            if (!playerName) {
+                alert('Please enter your player name.');
+                return;
+            }
+            fetch('give_reward.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `reward_id=${rewardId}&reward=${reward}&player_name=${playerName}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Reward claimed successfully!');
+                } else {
+                    alert(data.error);
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        #countdown {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</body>
+</html>
