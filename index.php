@@ -6,10 +6,41 @@ $config = include('config.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rewards</title>
+    <title>WebRewards | Used by best servers</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('img/bg.webp') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 50px;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -19,10 +50,10 @@ $config = include('config.php');
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -31,10 +62,12 @@ $config = include('config.php');
             width: 80%;
             text-align: center;
         }
+
         #countdown {
             font-weight: bold;
             color: red;
         }
+
         .reward {
             display: inline-block;
             margin: 10px;
@@ -43,17 +76,23 @@ $config = include('config.php');
             text-align: center;
             cursor: pointer;
         }
+
         .reward img {
             max-width: 100px;
             max-height: 100px;
         }
+
         #playerNameDisplay {
             position: absolute;
             top: 10px;
             right: 10px;
-            font-size: 18px;
+            font-size: 9px;
             font-weight: bold;
+            background: rgba(255, 255, 255, 0.5); /* Semi-transparent background */
+            padding: 5px 10px;
+            border-radius: 5px;
         }
+
         .footer {
             position: fixed;
             bottom: 10px;
@@ -65,10 +104,12 @@ $config = include('config.php');
             font-size: 14px;
             text-align: center;
         }
+
         .footer a {
             color: #FFD700;
             text-decoration: none;
         }
+
         /* Custom Popup */
         .custom-popup {
             display: none;
@@ -85,6 +126,7 @@ $config = include('config.php');
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+
         .custom-popup button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -94,12 +136,14 @@ $config = include('config.php');
             border-radius: 5px;
             cursor: pointer;
         }
+
         .custom-popup button:hover {
             background-color: #ddd;
         }
     </style>
 </head>
 <body>
+    <div class="background"></div>
     <div class="container">
         <div id="videoModal" class="modal">
             <div class="modal-content">
@@ -116,7 +160,7 @@ $config = include('config.php');
         <div id="playerNameDisplay"></div>
         <div id="rewardsContainer"></div>
         <div class="footer">
-            Developed with Love By <a href="https://discord.gg/NvbuhzP95J" target="_blank">Heso</a>
+            Developed with Love By <a href="https://en.snezik.cz/" target="_blank">Heso</a>
         </div>
         <!-- Custom Popup -->
         <div id="customPopup" class="custom-popup">
